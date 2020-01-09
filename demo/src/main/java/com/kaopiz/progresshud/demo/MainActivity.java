@@ -22,12 +22,15 @@
 
 package com.kaopiz.progresshud.demo;
 
+import android.content.DialogInterface;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.kaopiz.kprogresshud.KProgressHUD;
 import com.kaopiz.progresshud.R;
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button detailIndeterminate = (Button) findViewById(R.id.detail_indeterminate);
         detailIndeterminate.setOnClickListener(this);
+
+        Button graceIndeterminate = (Button) findViewById(R.id.grace_indeterminate);
+        graceIndeterminate.setOnClickListener(this);
 
         Button determinate = (Button) findViewById(R.id.determinate);
         determinate.setOnClickListener(this);
@@ -81,7 +87,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 hud = KProgressHUD.create(this)
                         .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                         .setLabel("Please wait")
-                        .setCancellable(true);
+                        .setCancellable(new DialogInterface.OnCancelListener()
+                        {
+                            @Override public void onCancel(DialogInterface
+                                dialogInterface)
+                            {
+                                Toast.makeText(MainActivity.this, "You " +
+                                    "cancelled manually!", Toast
+                                    .LENGTH_SHORT).show();
+                            }
+                        });
+
                 scheduleDismiss();
                 break;
             case R.id.detail_indeterminate:
@@ -89,6 +105,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                         .setLabel("Please wait")
                         .setDetailsLabel("Downloading data");
+                scheduleDismiss();
+                break;
+            case R.id.grace_indeterminate:
+                hud = KProgressHUD.create(this)
+                        .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                        .setGraceTime(1000);
                 scheduleDismiss();
                 break;
             case R.id.determinate:
@@ -112,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.custom_view:
                 ImageView imageView = new ImageView(this);
-                imageView.setImageResource(R.mipmap.ic_launcher);
+                imageView.setBackgroundResource(R.drawable.spin_animation);
+                AnimationDrawable drawable = (AnimationDrawable) imageView.getBackground();
+                drawable.start();
                 hud = KProgressHUD.create(this)
                         .setCustomView(imageView)
                         .setLabel("This is a custom view");
